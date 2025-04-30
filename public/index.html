@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Asistencia</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="nav-container">
+            <div class="nav">
+                <a href="index.html" class="nav-brand">
+                    <img src="logo.png" alt="CITE Textil Camélidos Cusco" class="logo">
+                    <span class="brand-text">
+                        <i class="fas fa-clock"></i>
+                        Registro Asistencia
+                    </span>
+                </a>
+                <div class="nav-links">
+                    <a href="trabajador.html" class="nav-button">
+                        <i class="fas fa-user-tie"></i>
+                        Trabajador
+                    </a>
+                    <a href="visitante.html" class="nav-button">
+                        <i class="fas fa-user"></i>
+                        Visitante
+                    </a>
+                    <div class="nav-button" id="btnRegistrarSalida">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Registrar Salida
+                    </div>
+                    <a href="registros.html" class="nav-button">
+                        <i class="fas fa-list"></i>
+                        Registros
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="welcome-message">
+                <h2>Bienvenido al Sistema de Registro de Asistencia</h2>
+                <p class="welcome-description">Sistema de control de asistencia del CITE Textil Camélidos Cusco</p>
+            </div>
+
+            <div class="welcome-buttons">
+                <a href="trabajador.html" class="welcome-button">
+                    <i class="fas fa-user-tie"></i>
+                    <div class="button-content">
+                        <span class="button-title">Registro de Trabajador</span>
+                        <span class="button-description">Registrar entrada de personal</span>
+                    </div>
+                </a>
+                <a href="visitante.html" class="welcome-button">
+                    <i class="fas fa-user"></i>
+                    <div class="button-content">
+                        <span class="button-title">Registro de Visitante</span>
+                        <span class="button-description">Registrar entrada de visitantes</span>
+                    </div>
+                </a>
+                <div class="welcome-button" onclick="document.getElementById('modalSalida').style.display='block'">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <div class="button-content">
+                        <span class="button-title">Registrar Salida</span>
+                        <span class="button-description">Registrar salida de personal o visitantes</span>
+                    </div>
+                </div>
+                <a href="registros.html" class="welcome-button">
+                    <i class="fas fa-list"></i>
+                    <div class="button-content">
+                        <span class="button-title">Ver Registros</span>
+                        <span class="button-description">Consultar historial de registros</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="search-section">
+                <h3>Buscar Registro</h3>
+                <div class="search-container">
+                    <div class="input-with-icon">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchDNI" placeholder="Buscar por DNI...">
+                    </div>
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para registrar salida -->
+    <div id="modalSalida" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Registrar Salida</h2>
+            <form id="formSalida">
+                <div class="form-group">
+                    <label for="dniSalida">DNI</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="dniSalida" name="dni" required placeholder="Ingrese el DNI">
+                    </div>
+                </div>
+                <button type="submit">
+                    <i class="fas fa-check"></i>
+                    Registrar Salida
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-message h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .welcome-description {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .welcome-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-button {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background-color: white;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 0.8rem;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary-color);
+            cursor: pointer;
+        }
+
+        .welcome-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .welcome-button i {
+            font-size: 2rem;
+            min-width: 40px;
+        }
+
+        .button-content {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .button-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .button-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .welcome-button:hover .button-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        @media (max-width: 768px) {
+            .welcome-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .search-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .input-with-icon {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .input-with-icon input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #ddd;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-with-icon input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+        }
+
+        .search-results {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .logo {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .brand-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+
+    <script>
+        // Funciones para el modal
+        const modal = document.getElementById('modalSalida');
+        const btn = document.getElementById('btnRegistrarSalida');
+        const span = document.getElementsByClassName('close')[0];
+
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Función para buscar por DNI
+        async function buscarPorDNI(dni) {
+            try {
+                const response = await fetch(`/api/registros?dni=${dni}`);
+                const registros = await response.json();
+                const resultsContainer = document.getElementById('searchResults');
+                
+                if (registros.length > 0) {
+                    resultsContainer.innerHTML = registros.map(registro => `
+                        <div class="search-result-item">
+                            <p><strong>DNI:</strong> ${registro.DNI}</p>
+                            <p><strong>Nombre:</strong> ${registro.Nombre}</p>
+                            <p><strong>Tipo:</strong> ${registro.Tipo}</p>
+                            <p><strong>Estado:</strong> ${registro.FechaSalida ? 'Salida registrada' : 'Activo'}</p>
+                            ${!registro.FechaSalida ? 
+                                `<button class="registro-salida" onclick="registrarSalida('${registro.DNI}')">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Registrar Salida
+                                </button>` : 
+                                ''}
+                        </div>
+                    `).join('');
+                } else {
+                    resultsContainer.innerHTML = '<p>No se encontraron registros con ese DNI</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('searchResults').innerHTML = '<p>Error al buscar registros</p>';
+            }
+        }
+
+        // Función para registrar salida
+        async function registrarSalida(dni) {
+            try {
+                const response = await fetch('/api/registrar-salida', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ dni })
+                });
+
+                if (response.ok) {
+                    alert('Salida registrada exitosamente');
+                    modal.style.display = "none";
+                    document.getElementById('formSalida').reset();
+                    buscarPorDNI(dni);
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Error al registrar la salida');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al registrar la salida');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('searchDNI').addEventListener('input', (e) => {
+            const dni = e.target.value;
+            if (dni.length >= 8) {
+                buscarPorDNI(dni);
+            } else {
+                document.getElementById('searchResults').innerHTML = '';
+            }
+        });
+
+        document.getElementById('formSalida').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const dni = document.getElementById('dniSalida').value;
+            registrarSalida(dni);
+        });
+    </script>
+</body>
+</html>

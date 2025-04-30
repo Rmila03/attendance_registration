@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Registro de Asistencia - Trabajador</title>
+    <link rel="stylesheet" href="styles.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+</head>
+<body>
+    <div class="header">
+        <div class="nav-container">
+            <div class="nav">
+                <a href="index.html" class="nav-brand">
+                    <i class="fas fa-clock"></i>
+                    Registro Asistencia
+                </a>
+                <div class="nav-links">
+                    <a href="trabajador.html" class="nav-button">
+                        <i class="fas fa-user-tie"></i>
+                        Trabajador
+                    </a>
+                    <a href="visitante.html" class="nav-button">
+                        <i class="fas fa-user"></i>
+                        Visitante
+                    </a>
+                    <a href="registros.html" class="nav-button">
+                        <i class="fas fa-list"></i>
+                        Registros
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <h1 style="text-align: center; margin-bottom: 2rem;">Registro de Trabajador</h1>
+            <form id="registroForm">
+                <div class="form-group">
+                    <label for="dni">DNI</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="dni" name="dni" required placeholder="Ingrese el DNI">
+                    </div>
+                </div>
+                <div class="name-fields">
+                    <div class="form-group">
+                        <label for="nombres">Nombres</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="nombres" name="nombres" required placeholder="Ingrese los nombres">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellidos">Apellidos</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="apellidos" name="apellidos" required placeholder="Ingrese los apellidos">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="telefono" name="telefono" required placeholder="Ingrese el teléfono">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="laptop">¿Está ingresando con laptop?</label>
+                    <select id="laptop" name="laptop" class="filtro-select">
+                        <option value="No">No</option>
+                        <option value="Sí">Sí</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="marcaLaptop">Marca de la laptop (si aplica)</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-laptop"></i>
+                        <input type="text" id="marcaLaptop" name="marcaLaptop" placeholder="Ingrese la marca (opcional)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="observaciones">Observaciones</label>
+                    <textarea id="observaciones" name="observaciones" rows="3" placeholder="Ingrese observaciones (opcional)"></textarea>
+                </div>
+                <button type="submit">
+                    <i class="fas fa-check"></i>
+                    Registrar Entrada
+                </button>
+            </form>
+            <div class="registro-exitoso" id="mensajeExito">
+                <i class="fas fa-check-circle"></i>
+                Registro exitoso
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registroForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                dni: document.getElementById('dni').value,
+                nombre: `${document.getElementById('nombres').value} ${document.getElementById('apellidos').value}`,
+                telefono: document.getElementById('telefono').value,
+                tipo: 'Trabajador',
+                laptop: document.getElementById('laptop').value,
+                marcaLaptop: document.getElementById('marcaLaptop').value,
+                observaciones: document.getElementById('observaciones').value
+            };
+
+            try {
+                const response = await fetch('/registrar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    document.getElementById('mensajeExito').style.display = 'flex';
+                    document.getElementById('registroForm').reset();
+                    setTimeout(() => {
+                        document.getElementById('mensajeExito').style.display = 'none';
+                    }, 3000);
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Error al registrar. Por favor, intente nuevamente.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al registrar. Por favor, intente nuevamente.');
+            }
+        });
+    </script>
+</body>
+</html>

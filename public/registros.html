@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registros</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="nav-container">
+            <div class="nav">
+                <a href="index.html" class="nav-brand">
+                    <i class="fas fa-clock"></i>
+                    Registro Asistencia
+                </a>
+                <div class="nav-links">
+                    <a href="trabajador.html" class="nav-button">
+                        <i class="fas fa-user-tie"></i>
+                        Trabajador
+                    </a>
+                    <a href="visitante.html" class="nav-button">
+                        <i class="fas fa-user"></i>
+                        Visitante
+                    </a>
+                    <div class="nav-button" id="btnRegistrarSalida">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Registrar Salida
+                    </div>
+                    <a href="registros.html" class="nav-button">
+                        <i class="fas fa-list"></i>
+                        Registros
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <h1 style="text-align: center; margin-bottom: 2rem;">Registros</h1>
+            <div class="registros-filtros">
+                <select id="tipoFiltro" class="filtro-select">
+                    <option value="">Todos</option>
+                    <option value="Trabajador">Trabajadores</option>
+                    <option value="Visitante">Visitantes</option>
+                </select>
+                <input type="text" id="buscarRegistro" class="filtro-buscar" placeholder="Buscar por DNI o nombre...">
+            </div>
+            <div class="table-container">
+                <table class="registros-table">
+                    <thead>
+                        <tr>
+                            <th>DNI</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Teléfono</th>
+                            <th>Fecha Entrada</th>
+                            <th>Fecha Salida</th>
+                            <th>Observaciones</th>                        </tr>
+                    </thead>
+                    <tbody id="registrosBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para registrar salida -->
+    <div id="modalSalida" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Registrar Salida</h2>
+            <form id="formSalida">
+                <div class="form-group">
+                    <label for="dniSalida">DNI</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="dniSalida" name="dni" required placeholder="Ingrese el DNI">
+                    </div>
+                </div>
+                <button type="submit">
+                    <i class="fas fa-check"></i>
+                    Registrar Salida
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Funciones para el modal
+        const modal = document.getElementById('modalSalida');
+        const btn = document.getElementById('btnRegistrarSalida');
+        const span = document.getElementsByClassName('close')[0];
+
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        async function cargarRegistros() {
+            try {
+                const response = await fetch('/api/registros');
+                const registros = await response.json();
+                const tbody = document.getElementById('registrosBody');
+                tbody.innerHTML = '';
+
+                registros.forEach(registro => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${registro.DNI}</td>
+                        <td>${registro.Nombre}</td>
+                        <td>
+                            <span class="badge ${registro.Tipo === 'Trabajador' ? 'badge-trabajador' : 'badge-visitante'}">
+                                ${registro.Tipo}
+                            </span>
+                        </td>
+                        <td>${registro.Telefono}</td>
+                        <td>${new Date(registro.FechaEntrada).toLocaleString()}</td>
+                        <td>${registro.FechaSalida ? new Date(registro.FechaSalida).toLocaleString() : '-'}</td>
+                        <td>${registro.Observaciones || '-'}</td>
+                        <td>
+                            <button class="btn-salida" onclick="registrarSalida('${registro.DNI}')" ${registro.Estado === 'Completado' ? 'disabled' : ''}>
+                                <i class="fas fa-sign-out-alt"></i>
+                                ${registro.Estado === 'Completado' ? 'Salida Registrada' : 'Registrar Salida'}
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar los registros');
+            }
+        }
+
+        async function registrarSalida(dni) {
+            try {
+                const response = await fetch('/registrar-salida', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ dni })
+                });
+
+                if (response.ok) {
+                    mostrarMensaje('Salida registrada exitosamente', 'success');
+                    cargarRegistros();
+                } else {
+                    const error = await response.json();
+                    mostrarMensaje(error.error || 'Error al registrar la salida', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error al conectar con el servidor', 'error');
+            }
+        }
+
+        function mostrarMensaje(mensaje, tipo) {
+            const mensajeElement = document.createElement('div');
+            mensajeElement.className = `mensaje-${tipo}`;
+            mensajeElement.innerHTML = `
+                <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                ${mensaje}
+            `;
+            
+            document.body.appendChild(mensajeElement);
+            
+            setTimeout(() => {
+                mensajeElement.remove();
+            }, 3000);
+        }
+
+        document.getElementById('formSalida').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const dni = document.getElementById('dniSalida').value;
+            registrarSalida(dni);
+        });
+
+        document.getElementById('tipoFiltro').addEventListener('change', cargarRegistros);
+        document.getElementById('buscarRegistro').addEventListener('input', cargarRegistros);
+
+        cargarRegistros();
+    </script>
+
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .btn-salida {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-salida:hover:not(:disabled) {
+            background-color: #c82333;
+        }
+
+        .btn-salida:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .mensaje-success,
+        .mensaje-error {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .mensaje-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .mensaje-error {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</body>
+</html>
